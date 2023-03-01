@@ -2,41 +2,49 @@ import unittest
 import GedcomUserstories
 
 from datetime import datetime, timedelta
+
+
 class TestDates(unittest.TestCase):
 
     def test_birth_date(self):
         futuredate = datetime.now() + timedelta(days=10)
         futuredate_string = futuredate.strftime('%d %b %Y')
-        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False, "Birth date should not be after current date")
+        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False,
+                         "Birth date should not be after current date")
 
     def test_marriage_date(self):
         futuredate = datetime.now() + timedelta(days=10)
         futuredate_string = futuredate.strftime('%d %b %Y')
-        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False, "Marriage date should not be after current date")
+        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False,
+                         "Marriage date should not be after current date")
 
     def test_divorce_date(self):
         futuredate = datetime.now() + timedelta(days=10)
         futuredate_string = futuredate.strftime('%d %b %Y')
-        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False, "Divorce date should not be after current date")
+        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False,
+                         "Divorce date should not be after current date")
 
     def test_death_date(self):
         futuredate = datetime.now() + timedelta(days=10)
         futuredate_string = futuredate.strftime('%d %b %Y')
-        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False, "Death date should not be after current date")
-                
+        self.assertEqual(GedcomUserstories.is_date_before_current_date(futuredate_string), False,
+                         "Death date should not be after current date")
+
     def test_birthdate_after_marrdate(self):
         futuredate = datetime.now()
         futuredate_str = futuredate.strftime('%d %b %Y')
         birthdate = datetime.now() + timedelta(days=10)
         birthday_string = birthdate.strftime('%d %b %Y')
-        self.assertEqual(GedcomUserstories.is_birthdate_before_marrdate(birthday_string,futuredate_str), False, "Birth date should not be after marriage date")
+        self.assertEqual(GedcomUserstories.is_birthdate_before_marrdate(birthday_string, futuredate_str), False,
+                         "Birth date should not be after marriage date")
 
     def test_birthdate_before_marrdate(self):
         birthdate = datetime.now()
         birthday_string = birthdate.strftime('%d %b %Y')
         futuredate = datetime.now() + timedelta(days=10)
-        futuredate_str =futuredate.strftime('%d %b %Y')
-        self.assertNotEqual(GedcomUserstories.is_birthdate_before_marrdate(birthday_string,futuredate_str), False, "Birth date is before marriage date")
+        futuredate_str = futuredate.strftime('%d %b %Y')
+        self.assertNotEqual(GedcomUserstories.is_birthdate_before_marrdate(birthday_string, futuredate_str), False,
+                            "Birth date is before marriage date")
 
     def test_marriage_before_death(self):
         marr_date_str = '01 Jan 2020'
@@ -47,18 +55,21 @@ class TestDates(unittest.TestCase):
         # Test when divorce is before death
         divday = "1 JAN 2022"
         deatday = "12 JAN 2022"
-        self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), True, "Divorce before death test failed.")
+        self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), True,
+                         "Divorce before death test failed.")
 
         # Test when divorce is after death
         divday = "12 JAN 2022"
         deatday = "1 JAN 2022"
-        self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), False, "Divorce after death test failed.")
+        self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), False,
+                         "Divorce after death test failed.")
 
         # Test when either divorce or death date is missing
         divday = "10 MAR 2000"
         deatday = ""
-        self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), False, "Missing death date test failed.")
-    
+        self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), False,
+                         "Missing death date test failed.")
+
     def test_no_bigamy(self):
         # Test case where there are no marriages
         marr_list = []
@@ -82,21 +93,21 @@ class TestDates(unittest.TestCase):
         dad_birthdate = '01 Jan 1950'
         child_birthdate = '01 Jan 2000'
         self.assertTrue(GedcomUserstories.parents_not_too_old(mom_birthdate, dad_birthdate, child_birthdate))
-        
+
         # Test case where mom is too old
         mom_birthdate = '01 Jan 1930'
         dad_birthdate = '01 Jan 1950'
         child_birthdate = '01 Jan 2000'
         self.assertFalse(GedcomUserstories.parents_not_too_old(mom_birthdate, dad_birthdate, child_birthdate))
-        
+
         # Test case where both parents are too old
         mom_birthdate = '01 Jan 1930'
         dad_birthdate = '01 Jan 1920'
         child_birthdate = '01 Jan 2000'
         self.assertFalse(GedcomUserstories.parents_not_too_old(mom_birthdate, dad_birthdate, child_birthdate))
-    
+
     def test_both_dates_provided(self):
-       self.assertTrue(GedcomUserstories.is_marriage_before_divorce("01 Jan 2000", "01 Jan 2001"))
+        self.assertTrue(GedcomUserstories.is_marriage_before_divorce("01 Jan 2000", "01 Jan 2001"))
 
     def test_missing_marriage_date(self):
         self.assertFalse(GedcomUserstories.is_marriage_before_divorce("", "01 Jan 2000"))
@@ -104,6 +115,12 @@ class TestDates(unittest.TestCase):
     def test_missing_both_dates(self):
         self.assertFalse(GedcomUserstories.is_marriage_before_divorce("", ""))
 
+    def test_birth_before_death(self):
+        self.assertTrue(GedcomUserstories.is_birth_before_death("01 JAN 1900", "01 JAN 2000"))
+
+    def test_birth_after_death(self):
+        self.assertFalse(GedcomUserstories.is_birth_before_death("01 JAN 2000", "01 JAN 1900"))
+
+
 if __name__ == '__main__':
     unittest.main()
-    

@@ -20,6 +20,7 @@ indi_dict = {}
 current_fam = {}
 
 
+# US01
 def is_date_before_current_date(date_string):
     if date_string == "":
         return False
@@ -28,6 +29,7 @@ def is_date_before_current_date(date_string):
         return False
 
 
+# US02
 def is_birthdate_before_marrdate(bday_string1, marrday_string2):
     if bday_string1 and marrday_string2 == "":
         return False
@@ -35,6 +37,31 @@ def is_birthdate_before_marrdate(bday_string1, marrday_string2):
     marrday_string2 = datetime.strptime(marrday_string2, '%d %b %Y')
     if bday_string1 > marrday_string2:
         return False
+
+
+# US03
+def is_birth_before_death(birth_string, death_string):
+    if birth_string and death_string == "":
+        return False
+    birth = datetime.strptime(birth_string, '%d %b %Y')
+    death = datetime.strptime(death_string, '%d %b %Y')
+    if birth > death:
+        print(f"Error: Birth date {birth_string} is after death date {death_string}")
+        return False
+    return True
+
+
+# US04
+def is_marriage_before_divorce(marriageday_string, divday_string):
+    if not marriageday_string or not divday_string:
+        print("Error: Missing date")
+        return False
+    marriageday = datetime.strptime(marriageday_string, '%d %b %Y')
+    divday = datetime.strptime(divday_string, '%d %b %Y')
+    if marriageday > divday:
+        print("Error: Marriage date is after divorce date")
+        return False
+    return True
 
 
 # US05
@@ -92,19 +119,6 @@ def parents_not_too_old(mom_birthdate_string, dad_birthdate_string, child_birthd
         return False
 
     # parents are not too old
-    return True
-
-
-# US04
-def is_marriage_before_divorce(marriageday_string, divday_string):
-    if not marriageday_string or not divday_string:
-        print("Error: Missing date")
-        return False
-    marriageday = datetime.strptime(marriageday_string, '%d %b %Y')
-    divday = datetime.strptime(divday_string, '%d %b %Y')
-    if marriageday > divday:
-        print("Error: Marriage date is after divorce date")
-        return False
     return True
 
 
