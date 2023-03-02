@@ -116,6 +116,5 @@ class TestDates(unittest.TestCase):
 		deathdate_str = deathdate.strftime('%d %b %Y')
 		self.assertNotEqual(GedcomUserstories.is_birth_before_death(birthday_string, deathdate_str), False, "Birth date is before death date")
 
-
 if __name__ == '__main__':
 	unittest.main()
