@@ -232,4 +232,3 @@ for fam in families:
 
 print("\nFamilies:")
 print(fam_table)
-
