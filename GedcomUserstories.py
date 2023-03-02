@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from prettytable import PrettyTable
-
+import us1314
 supported_tags = ['INDI', 'NAME', 'SEX', 'BIRT', 'DEAT', 'FAMC', 'FAMS', 'FAM', 'MARR', 'HUSB', 'WIFE', 'CHIL', 'DIV']
 
 def parse_line(line):
@@ -113,6 +113,8 @@ def parents_not_too_old(date_string1, date_string2, date_string3):
     if date2 >= 80:
         return False
     return True
+# US14
+us1314.Main('gedcom_project.ged')
 
 # US04
 def is_marriage_before_divorce(marriageday_string, divday_string):
