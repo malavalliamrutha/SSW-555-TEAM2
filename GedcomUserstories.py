@@ -113,7 +113,8 @@ def parents_not_too_old(date_string1, date_string2, date_string3):
     if date2 >= 80:
         return False
     return True
-# US14
+
+# US13&14
 us1314.Main('gedcom_project.ged')
 
 # US04
