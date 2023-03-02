@@ -83,6 +83,20 @@ def is_divorce_before_death(divday_string, deathday_string):
     deathday = datetime.strptime(deathday_string, '%d %b %Y')
     if divday > deathday:
         return False
+     return True
+
+# US09
+def birth_before_parents_death(birth_date, mother_death_date, father_death_date):
+    if birth_date > mother_death_date:
+        return False
+    if birth_date > father_death_date:
+        return False
+    return True
+	
+#  US10
+def marriage_after_14(marriage_date, birth_date):
+    if (marriage_date - birth_date).days / 365 < 14:
+        return False
     return True
 
 # US11
