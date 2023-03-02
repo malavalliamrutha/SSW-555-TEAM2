@@ -2,7 +2,7 @@
 
 from time import monotonic, strptime
 import datetime
-from prettytable import PrettyTable
+import itertools
 
 def getNameUsingID(individualList, ID):
     for i in individualList:
@@ -35,7 +35,22 @@ def getBirthDateByID(pdata, id):
     for i in pdata:
         if(i[0] == id):
             return i[3]
-        
+
+def difference_months(dateData1, dateData2):
+    temp1 = dateData1.split('-')
+    temp2 = dateData2.split('-')
+    ndateData1 = datetime.date(int(temp1[0]), int(temp1[1]), int(temp1[2]))
+    ndateData2 = datetime.date(int(temp2[0]), int(temp2[1]), int(temp2[2]))
+    return int((ndateData1 - ndateData2).days / 30.4)
+
+
+def difference_days(dateData1, dateData2):
+    temp1 = dateData1.split('-')
+    temp2 = dateData2.split('-')
+    ndateData1 = datetime.date(int(temp1[0]), int(temp1[1]), int(temp1[2]))
+    ndateData2 = datetime.date(int(temp2[0]), int(temp2[1]), int(temp2[2]))
+    return abs(int((ndateData1 - ndateData2).days))
+	        
 def convertDateFormat(date):
     temp = date.split()
     if(temp[1] == 'JAN'): temp[1] = '01';
@@ -115,18 +130,32 @@ def Gparse(file_name):
                     if(date_id == 'DIV'):
                         famdata[4] = convertDateFormat(date)
     return pdata, fdata
-    
-def US03(id, birth_date, death_date):
-    if (death_date == 0):
-        return
-    if birth_date > death_date:
-        return("ERROR: INDIVIDUAL: US03 "+ id +" Died "+str(death_date)+" before born "+str(birth_date))
 
-def US04(id,married_data,divorce_data ):
-    if (divorce_data == 0):
-        return
-    if married_data > divorce_data:
-        return("ERROR: FAMILY: US04" + id +"Divorced" + str(divorce_data)+"before married"+ str(married_data))
+def get_sibling_pairs(family, individuals):
+    siblings = family[5]
+    if siblings and len(siblings) > 1:
+        return list(itertools.combinations(siblings, 2))
+    return []
+
+def US13(families, individuals):
+    date_list = []
+    for family in families:
+        for sibling_pair in get_sibling_pairs(family, individuals):
+            sibling1_birth = getBirthDateByID(individuals, sibling_pair[0])
+            sibling2_birth = getBirthDateByID(individuals, sibling_pair[1])
+            siblings_months = abs(difference_months(sibling1_birth, sibling2_birth))
+            siblings_days = abs(difference_days(sibling1_birth, sibling2_birth))
+            if siblings_months <= 8 and siblings_days >= 3:
+                date_list.append(sibling_pair)
+                print(f"ERROR: INDIVIDUAL: US13: Siblings {sibling_pair[0]} and {sibling_pair[1]} have their birth dates eight months apart")
+            elif siblings_months == 0 and siblings_days >= 2:
+                date_list.append(sibling_pair)
+                print(f"ERROR: INDIVIDUAL: US13: Siblings {sibling_pair[0]} and {sibling_pair[1]} have their birth days 2 or more days apart")
+    if not date_list:
+        print("US13: All the siblings have correct spacing")
+    else:
+        print("ERROR: INDIVIDUAL: US13: The following sibling pairs have bad birth date spacings:")
+        print(date_list)
 
 def US14(list_individual,list_family):
     multipleBirthsList = []
@@ -156,15 +185,5 @@ def Main(file_name):
     pdata, fdata = Gparse(file_name)
     pdata.sort()
     fdata.sort()
-    for i in pdata:
-        table = PrettyTable(["ID", "Name" , "Sex", "Birth Date", "Death Date" , "Child" , "Spouse"])
-        table.add_row([i[0] , i[1], i[2],i[3], i[4] , i[5] , i[6]])
-        print (table)
-    for i in fdata:
-        table1 = PrettyTable(["ID", "Husband's Name" , "Wife's Name"])
-        table1.add_row([i[0] , getNameUsingID(pdata,i[1]) , getNameUsingID(pdata,i[2]) ])
-        print (table1)
-    US14(pdata, fdata)
-    print(fdata)
-Main('/Users/byy/Desktop/testforU0304.ged')
-    
+    US13(fdata,pdata)
+    US14(pdata, fdata)  
