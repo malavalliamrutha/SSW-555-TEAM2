@@ -60,6 +60,36 @@ class TestDates(unittest.TestCase):
 		deatday = ""
 		self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), False, "Missing death date test failed.")
 
+	def test_birth_before_parents_death(self):
+                # Test case where birth is before both parents' deaths
+                birth_date = datetime.strptime('01 Jan 1990', '%d %b %Y')
+                mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+                father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
+                self.assertTrue(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
+
+                # Test case where birth is after mother's death
+                birth_date = datetime.strptime('01 Jan 2010', '%d %b %Y')
+                mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+                father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
+                self.assertFalse(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
+
+                # Test case where birth is after father's death
+                birth_date = datetime.strptime('01 Jan 2010', '%d %b %Y')
+                mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+                father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
+                self.assertFalse(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
+
+        def test_marriage_after_14(self):
+                # Test case where marriage is after 14 years from birth
+                birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+                marriage_date = birth_date + timedelta(days=365*14)
+                self.assertTrue(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
+
+                # Test case where marriage is before 14 years from birth
+                birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+                marriage_date = birth_date + timedelta(days=365*13)
+                self.assertFalse(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
+	
 	def test_no_bigamy(self):
 		# Test case where there are no marriages
 		marr_list = []
