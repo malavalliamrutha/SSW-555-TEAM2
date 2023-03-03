@@ -61,34 +61,34 @@ class TestDates(unittest.TestCase):
 		self.assertEqual(GedcomUserstories.is_divorce_before_death(divday, deatday), False, "Missing death date test failed.")
 
 	def test_birth_before_parents_death(self):
-                # Test case where birth is before both parents' deaths
-                birth_date = datetime.strptime('01 Jan 1990', '%d %b %Y')
-                mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
-                father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
-                self.assertTrue(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
+    	# Test case where birth is before both parents' deaths
+		birth_date = datetime.strptime('01 Jan 1990', '%d %b %Y')
+		mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+		father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
+		self.assertTrue(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
 
-                # Test case where birth is after mother's death
-                birth_date = datetime.strptime('01 Jan 2010', '%d %b %Y')
-                mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
-                father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
-                self.assertFalse(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
+		# Test case where birth is after mother's death
+		birth_date = datetime.strptime('01 Jan 2010', '%d %b %Y')
+		mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+		father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
+		self.assertFalse(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
 
-                # Test case where birth is after father's death
-                birth_date = datetime.strptime('01 Jan 2010', '%d %b %Y')
-                mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
-                father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
-                self.assertFalse(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
+		# Test case where birth is after father's death
+		birth_date = datetime.strptime('01 Jan 2010', '%d %b %Y')
+		mother_death_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+		father_death_date = datetime.strptime('01 Jan 2005', '%d %b %Y')
+		self.assertFalse(GedcomUserstories.birth_before_parents_death(birth_date, mother_death_date, father_death_date))
 
-        def test_marriage_after_14(self):
-                # Test case where marriage is after 14 years from birth
-                birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
-                marriage_date = birth_date + timedelta(days=365*14)
-                self.assertTrue(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
+	def test_marriage_after_14(self):
+		# Test case where marriage is after 14 years from birth
+		birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+		marriage_date = birth_date + timedelta(days=365*14)
+		self.assertFalse(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
 
-                # Test case where marriage is before 14 years from birth
-                birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
-                marriage_date = birth_date + timedelta(days=365*13)
-                self.assertFalse(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
+		# Test case where marriage is before 14 years from birth
+		birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
+		marriage_date = birth_date + timedelta(days=365*13)
+		self.assertFalse(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
 	
 	def test_no_bigamy(self):
 		# Test case where there are no marriages
@@ -144,7 +144,21 @@ class TestDates(unittest.TestCase):
 		birthday_string = birthdate.strftime('%d %b %Y')
 		deathdate = datetime.now() + timedelta(days=10)
 		deathdate_str = deathdate.strftime('%d %b %Y')
-		self.assertNotEqual(GedcomUserstories.is_birth_before_death(birthday_string, deathdate_str), False, "Birth date is before death date")
+		self.assertEqual(GedcomUserstories.is_birth_before_death(birthday_string, deathdate_str), False, "Birth date is before death date")
+		
+	def test_birthdate_of_siblings_before_8_months(self):
+		birthdate = datetime.now()
+		birthday_string = birthdate.strftime('%d %b %Y')
+		birthday2 = datetime.now() + timedelta(days=240)
+		birthday2_string = birthday2.strftime('%d %b %Y')
+		self.assertFalse(GedcomUserstories.is_birthdates_of_siblings(birthday_string, birthday2_string))
+		
+	def test_morethan_5_siblings_birth_on_sameday(self):
+		birth_dates_valid = ['10 Jan 2022', '12 Jan 2022', '14 Jan 2022', '16 Jan 2022', '18 Jan 2022', '20 Jan 2022', '22 Jan 2022', '24 Jan 2022', '26 Jan 2022', '28 Jan 2022']
+		self.assertTrue(GedcomUserstories.is_morethan_5_siblings_at_sametime(birth_dates_valid))
+		birth_dates_invalid = ['10 Jan 2022', '12 Jan 2022', '14 Jan 2022', '16 Jan 2022', '18 Jan 2022','20 Jan 2022', '22 Jan 2022', '24 Jan 2022', '26 Jan 2022', '28 Jan 2022', '30 Jan 2022', '30 Jan 2022', '30 Jan 2022', '30 Jan 2022', '30 Jan 2022', '01 Feb 2022']
+		self.assertTrue(GedcomUserstories.is_morethan_5_siblings_at_sametime(birth_dates_invalid))
+
 
 if __name__ == '__main__':
 	unittest.main()
