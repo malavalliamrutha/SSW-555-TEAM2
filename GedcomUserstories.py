@@ -199,6 +199,42 @@ def is_birth_before_death(bday_string, dday_string):
         return False
     return True
 
+# US17
+def parents_not_marry_descendants(families, individuals):
+    # Create a dictionary to store all descendants of each individual
+    descendants = defaultdict(set)
+    for indi in individuals:
+        for fam_id in indi["FAMS"]:
+            fam = next(filter(lambda x: x["ID"] == fam_id, families), None)
+            if not fam:
+                continue
+            for child_id in fam.get("CHIL", []):
+                descendants[indi["ID"]].add(child_id)
+
+    # Check that no father is married to a descendant
+    for fam in families:
+        husband_id = fam.get("HUSB")
+        wife_id = fam.get("WIFE")
+        children_ids = fam.get("CHIL", [])
+        for child_id in children_ids:
+            child = next(filter(lambda x: x["ID"] == child_id, individuals), None)
+            if not child:
+                continue
+            spouses = []
+            for fam_id in child["FAMS"]:
+                fam = next(filter(lambda x: x["ID"] == fam_id, families), None)
+                if not fam:
+                    continue
+                if fam.get("HUSB") and fam["HUSB"] != husband_id:
+                    spouses.append(fam["HUSB"])
+                if fam.get("WIFE") and fam["WIFE"] != wife_id:
+                    spouses.append(fam["WIFE"])
+            if husband_id and husband_id in descendants.get(child_id, set()) and husband_id not in spouses:
+                return False
+            if wife_id and wife_id in descendants.get(child_id, set()) and wife_id not in spouses:
+                return False
+
+    return True
 
 # US21
 def correct_gender_for_role(role, gender):
@@ -285,11 +321,17 @@ with open("gedcom_project.ged") as file:
                     if parents_not_too_old(current_indi["BIRT"], current_indi["BIRT"], current_indi["BIRT"]) == False:
                         print(
                             f"ERROR: Families {current_fam['ID']}: Father {current_fam['HUSB']} is more than 80 years old than child")
+                    if parents_not_marry_descendants(families, individuals) == False:
+                        print(
+                            f"ERROR: Families {current_fam['ID']}: Father {current_fam['HUSB']} married with a descendant.")
                 elif tag == "WIFE" and current_fam is not None:
                     current_fam["WIFE"] = arguments.strip()
                     if parents_not_too_old(current_indi["BIRT"], current_indi["BIRT"], current_indi["BIRT"]) == False:
                         print(
                             f"ERROR: Families {current_fam['ID']}: Mother {current_fam['WIFE']} is more than 60 years old than child")
+                    if parents_not_marry_descendants(families, individuals) == False:
+                        print(
+                            f"ERROR: Families {current_fam['ID']}: Mother {current_fam['WIFE']} married with a descendant.")
                 elif tag == "CHIL" and current_fam is not None:
                     current_fam["CHIL"].append(arguments.strip())
                     if is_birthdate_before_marrdate_ofparents(current_fam["MARR"], current_fam["DIV"],
