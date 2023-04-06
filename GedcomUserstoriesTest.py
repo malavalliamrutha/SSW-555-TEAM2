@@ -91,6 +91,24 @@ class TestDates(unittest.TestCase):
 		birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
 		marriage_date = birth_date + timedelta(days=365 * 13)
 		self.assertFalse(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
+		
+	def test_fewer_than_15_siblings(self):
+		#Test case for Test case Fewer than 15 siblings
+            for fam_id, family in self.families.items():
+                children = family.get('children', [])
+                if len(children) >= 15:
+                self.assertFalse(GedcomUserstories.fewer_than_15_siblings(fam_id, self.families))
+		
+		
+	 def test_male_last_names(self):
+		#Test case for Male last names
+            for indi_id, individual in self.individuals.items():
+                if individual.get('gender') == 'M':
+                   last_name = individual.get('last_name', '')
+                   for fam_id, family in self.individuals.get(indi_id, {}).get('child_of', {}).items():
+                     father = self.individuals.get(family.get('husband_id', {}))
+                     if father and father.get('gender') == 'M':
+                     self.assertEqual(last_name, father.get('last_name', ''))
 
 	def test_no_bigamy(self):
 		# Test case where there are no marriages
