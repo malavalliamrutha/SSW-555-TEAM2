@@ -173,6 +173,18 @@ def is_morethan_5_siblings_at_sametime(birth_date):
         return False
     return True
 
+#US15
+def fewer_than_15_siblings(family):
+    return len(family.get('children', [])) < 15
+
+#US16
+def male_last_names(family, individuals):
+    last_names = set()
+    for child_id in family.get('children', []):
+        child = individuals.get(child_id, {})
+        if child.get('gender') == 'M':
+          last_names.add(child.get('last_name', ''))
+          return len(last_names) == 1
 
 # US04
 def is_marriage_before_divorce(marriageday_string, divday_string):
