@@ -226,7 +226,33 @@ def generate_unique_id(individuals, prefix='I'):
             print("ERROR: INDIVIDUAL: US22: Non-unique ID", id)
         i += 1
 
+#US18
+def siblings_cannot_marry(person1, person2):
+	if len(person1) < 2 or len(person2) < 2:
+		return False  
+	family_id1, parent_id1 = person1
+	family_id2, parent_id2 = person2
+	if family_id1 == family_id2:  
+		if parent_id1 == parent_id2:  
+			return False  
+		else:
+			return True 
+	else:
+		return True
+		
+#US19
+def first_cousin_cannot_marry(indi_id1, indi_id2, indi_fam1, indi_fam2, families):
+    indifam1 = families.get(indi_fam1, {})
+    indifam2 = families.get(indi_fam2, {})
+    indi_parents1 = families.get(indi_id1, {}).get('child_of', {})
+    indi_parents2 = families.get(indi_id2, {}).get('child_of', {})
+    indi_family1 = families.get(indi_parents1.get('family_id', ''), {})
+    indi_family2 = families.get(indi_parents2.get('family_id', ''), {})
+    if indi_family1 == indi_family2:
+        return False
+    return True
 
+	
 with open("gedcom_project.ged") as file:
     for line in file:
         result = parse_line(line)
@@ -280,6 +306,8 @@ with open("gedcom_project.ged") as file:
                     current_indi["FAMC"].append(arguments.strip())
                 elif tag == "FAMS" and current_indi is not None:
                     current_indi["FAMS"].append(arguments.strip())
+                    if siblings_cannot_marry(current_indi["FAMS"], current_indi["FAMS"]) == False:
+                    	print(f"ERROR: Siblings who belong to same family {current_indi['FAMS']} cannot marry each other")
                 elif tag == "HUSB" and current_fam is not None:
                     current_fam["HUSB"] = arguments.strip()
                     if parents_not_too_old(current_indi["BIRT"], current_indi["BIRT"], current_indi["BIRT"]) == False:
