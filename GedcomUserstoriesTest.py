@@ -91,24 +91,25 @@ class TestDates(unittest.TestCase):
 		birth_date = datetime.strptime('01 Jan 2000', '%d %b %Y')
 		marriage_date = birth_date + timedelta(days=365 * 13)
 		self.assertFalse(GedcomUserstories.marriage_after_14(marriage_date, birth_date))
-		
+
 	def test_fewer_than_15_siblings(self):
-		#Test case for Test case Fewer than 15 siblings
-            for fam_id, family in self.families.items():
-                children = family.get('children', [])
-                if len(children) >= 15:
-                self.assertFalse(GedcomUserstories.fewer_than_15_siblings(fam_id, self.families))
-		
-		
-	 def test_male_last_names(self):
-		#Test case for Male last names
-            for indi_id, individual in self.individuals.items():
-                if individual.get('gender') == 'M':
-                   last_name = individual.get('last_name', '')
-                   for fam_id, family in self.individuals.get(indi_id, {}).get('child_of', {}).items():
-                     father = self.individuals.get(family.get('husband_id', {}))
-                     if father and father.get('gender') == 'M':
-                     self.assertEqual(last_name, father.get('last_name', ''))
+		family_with_fewer_siblings = {'children': ['C1', 'C2', 'C3']}
+		family_with_many_siblings = {'children': ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13', 'C14', 'C15']}
+
+		self.assertTrue(GedcomUserstories.fewer_than_15_siblings(family_with_fewer_siblings))
+		self.assertFalse(GedcomUserstories.fewer_than_15_siblings(family_with_many_siblings))
+
+	def test_male_last_names(self):
+		family = {'children': ['I1', 'I2', 'I3']}
+		individuals = {
+			'I1': {'gender': 'M', 'last_name': 'Smith'},
+			'I2': {'gender': 'M', 'last_name': 'Smith'},
+			'I3': {'gender': 'F', 'last_name': 'Smith'}
+		}
+		self.assertTrue(GedcomUserstories.male_last_names(family, individuals))
+
+		individuals['I2']['last_name'] = 'Johnson'
+		self.assertFalse(GedcomUserstories.male_last_names(family, individuals))
 
 	def test_no_bigamy(self):
 		# Test case where there are no marriages
@@ -126,6 +127,7 @@ class TestDates(unittest.TestCase):
 		# Test case where there are multiple marriages and some are not in chronological order
 		marr_list = ['01 Jan 2000', '01 Jan 1999', '01 Jan 2002']
 		self.assertTrue(GedcomUserstories.no_bigamy(marr_list))
+
 
 	def test_parents_not_too_old(self):
 		# Test case where parents are not too old
@@ -230,17 +232,6 @@ class TestDates(unittest.TestCase):
 			}
 		}
 		self.assertFalse(GedcomUserstories.first_cousin_cannot_marry('I3', 'I7', 'family1', 'family2', families))
-
-if __name__ == '__main__':
-    unittest.main()
-
-	# def test_generate_unique_id_with_existing_id(self):
-	     # Test that function prints error message when non-unique ID is generated
-	#     individuals = [{'INDI': {'ID': 'I1'}}, {'INDI': {'ID': 'I3'}}]
-	#     with self.assertLogs() as cm:
-	#         unique_id = GedcomUserstories.generate_unique_id(individuals)
-	#     self.assertEqual(unique_id, 'I2')
-	#     self.assertIn('ERROR:root:ERROR: INDIVIDUAL: US22: Non-unique ID I2', cm.output[0])
 
 if __name__ == '__main__':
 	unittest.main()

@@ -183,8 +183,10 @@ def male_last_names(family, individuals):
     for child_id in family.get('children', []):
         child = individuals.get(child_id, {})
         if child.get('gender') == 'M':
-          last_names.add(child.get('last_name', ''))
-          return len(last_names) == 1
+            last_names.add(child.get('last_name', ''))
+    
+    return len(last_names) <= 1
+
 
 # US04
 def is_marriage_before_divorce(marriageday_string, divday_string):
