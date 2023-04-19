@@ -216,6 +216,19 @@ class TestDates(unittest.TestCase):
 		person2 = {'family_id': '@F6000000191180558840@', 'parent_id': '@I6000000191181596839@'}
 		self.assertFalse(GedcomUserstories.siblings_cannot_marry(person1, person2))
 
+
+        def test_unique_first_names_in_families(self):
+                individuals = self.user_story.get_individuals()
+                families = self.user_story.get_families()
+                self.assertTrue(self.user_story.is_unique_first_names_in_families(individuals, families),
+                                "Not all first names in families are unique")
+
+        def test_corresponding_entries(self):
+                individuals = self.user_story.get_individuals()
+                families = self.user_story.get_families()
+                self.assertTrue(self.user_story.has_corresponding_entries(individuals, families),
+                                "Not all entries in families correspond to individuals")
+
 	def test_first_cousin_cannot_marry(self):
 		families = {
 			'family1': {
