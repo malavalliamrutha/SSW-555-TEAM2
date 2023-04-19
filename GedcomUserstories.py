@@ -199,6 +199,33 @@ def is_marriage_before_divorce(marriageday_string, divday_string):
     return True
 
 
+#US25
+def is_unique_first_names_in_families(individuals, families):
+    for family in families.values():
+        first_names = {}
+        for child_id in family.children:
+            child = individuals[child_id]
+            if child.name.split()[0] in first_names:
+                return False
+            first_names[child.name.split()[0]] = True
+    return True
+
+#US26
+def has_corresponding_entries(individuals, families):
+    for family in families.values():
+        for child_id in family.children:
+            child = individuals[child_id]
+            if child.birth_date != "" and child.id not in family.children_birth_dates:
+                return False
+            if child.death_date != "" and child.id not in family.children_death_dates:
+                return False
+        if family.marriage_date != "" and family.id not in family.marriage_dates:
+            return False
+        if family.divorce_date != "" and family.id not in family.divorce_dates:
+            return False
+    return True
+
+
 # US03
 def is_birth_before_death(bday_string, dday_string):
     bday_list = ['01 Feb 1999']
