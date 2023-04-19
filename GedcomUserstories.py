@@ -173,18 +173,20 @@ def is_morethan_5_siblings_at_sametime(birth_date):
         return False
     return True
 
-#US15
+
+# US15
 def fewer_than_15_siblings(family):
     return len(family.get('children', [])) < 15
 
-#US16
+
+# US16
 def male_last_names(family, individuals):
     last_names = set()
     for child_id in family.get('children', []):
         child = individuals.get(child_id, {})
         if child.get('gender') == 'M':
             last_names.add(child.get('last_name', ''))
-    
+
     return len(last_names) <= 1
 
 
@@ -199,7 +201,7 @@ def is_marriage_before_divorce(marriageday_string, divday_string):
     return True
 
 
-#US25
+# US25
 def is_unique_first_names_in_families(individuals, families):
     for family in families.values():
         first_names = {}
@@ -210,7 +212,8 @@ def is_unique_first_names_in_families(individuals, families):
             first_names[child.name.split()[0]] = True
     return True
 
-#US26
+
+# US26
 def has_corresponding_entries(individuals, families):
     for family in families.values():
         for child_id in family.children:
@@ -239,6 +242,7 @@ def is_birth_before_death(bday_string, dday_string):
     if bday > deathday:
         return False
     return True
+
 
 # US17
 def parents_not_marry_descendants(families, individuals):
@@ -277,7 +281,8 @@ def parents_not_marry_descendants(families, individuals):
 
     return True
 
-#20
+
+# 20
 def aunts_uncles_not_marry_nieces_nephews(families, individuals):
     """
     Check if any aunts or uncles have married with their nieces or nephews.
@@ -319,9 +324,11 @@ def aunts_uncles_not_marry_nieces_nephews(families, individuals):
                                 if not spouse_id2:
                                     continue
                                 if spouse_id2 == indi.get("ID"):
-                                    print(f"ERROR: Aunts or uncles {indi.get('ID')} are married to their niece/nephew {child.get('ID')}")
+                                    print(
+                                        f"ERROR: Aunts or uncles {indi.get('ID')} are married to their niece/nephew {child.get('ID')}")
                                     return False
     return True
+
 
 # US21
 def correct_gender_for_role(role, gender):
@@ -349,21 +356,23 @@ def generate_unique_id(individuals, prefix='I'):
             print("ERROR: INDIVIDUAL: US22: Non-unique ID", id)
         i += 1
 
-#US18
+
+# US18
 def siblings_cannot_marry(person1, person2):
-	if len(person1) < 2 or len(person2) < 2:
-		return False  
-	family_id1, parent_id1 = person1
-	family_id2, parent_id2 = person2
-	if family_id1 == family_id2:  
-		if parent_id1 == parent_id2:  
-			return False  
-		else:
-			return True 
-	else:
-		return True
-		
-#US19
+    if len(person1) < 2 or len(person2) < 2:
+        return False
+    family_id1, parent_id1 = person1
+    family_id2, parent_id2 = person2
+    if family_id1 == family_id2:
+        if parent_id1 == parent_id2:
+            return False
+        else:
+            return True
+    else:
+        return True
+
+
+# US19
 def first_cousin_cannot_marry(indi_id1, indi_id2, indi_fam1, indi_fam2, families):
     indifam1 = families.get(indi_fam1, {})
     indifam2 = families.get(indi_fam2, {})
@@ -375,7 +384,50 @@ def first_cousin_cannot_marry(indi_id1, indi_id2, indi_fam1, indi_fam2, families
         return False
     return True
 
-	
+
+# US23
+def is_name_birth_date_unique(individuals):
+    name_birth_date_pairs = set()
+
+    for individual in individuals:
+        name = individual.get('Name')
+        birth_date = individual.get('Birth Date')
+
+        if not name or not birth_date:
+            continue
+
+        pair = (name, birth_date)
+        if pair in name_birth_date_pairs:
+            print("ERROR: INDIVIDUAL: US23: Non-unique Name and Birth Date pair:", pair)
+            return False
+        else:
+            name_birth_date_pairs.add(pair)
+
+    return True
+
+
+# US24
+def are_families_unique_by_spouses(families):
+    spouse_pairs = set()
+
+    for family in families:
+        husband_name = family.get('Husband Name')
+        wife_name = family.get('Wife Name')
+        marriage_date = family.get('Marriage Date')
+
+        if not husband_name or not wife_name or not marriage_date:
+            continue
+
+        spouse_pair = (husband_name, wife_name, marriage_date)
+        if spouse_pair in spouse_pairs:
+            print("ERROR: FAMILY: US24: Non-unique family by spouses:", spouse_pair)
+            return False
+        else:
+            spouse_pairs.add(spouse_pair)
+
+    return True
+
+
 with open("gedcom_project.ged") as file:
     for line in file:
         result = parse_line(line)
@@ -431,21 +483,24 @@ with open("gedcom_project.ged") as file:
                 elif tag == "FAMS" and current_indi is not None:
                     current_indi["FAMS"].append(arguments.strip())
                     if siblings_cannot_marry(current_indi["FAMS"], current_indi["FAMS"]) == False:
-                    	print(f"ERROR: Siblings who belong to same family {current_indi['FAMS']} cannot marry each other")
+                        print(
+                            f"ERROR: Siblings who belong to same family {current_indi['FAMS']} cannot marry each other")
                 elif tag == "HUSB" and current_fam is not None:
                     current_fam["HUSB"] = arguments.strip()
                     if parents_not_too_old(current_indi["BIRT"], current_indi["BIRT"], current_indi["BIRT"]) == False:
                         print(
                             f"ERROR: Families {current_fam['ID']}: Father {current_fam['HUSB']} is more than 80 years old than child")
                     if parents_not_marry_descendants(families, individuals) == False:
-                        print(f"ERROR: Families {current_fam['ID']}: Father {current_fam['HUSB']} married with a descendant.")
+                        print(
+                            f"ERROR: Families {current_fam['ID']}: Father {current_fam['HUSB']} married with a descendant.")
                 elif tag == "WIFE" and current_fam is not None:
                     current_fam["WIFE"] = arguments.strip()
                     if parents_not_too_old(current_indi["BIRT"], current_indi["BIRT"], current_indi["BIRT"]) == False:
                         print(
                             f"ERROR: Families {current_fam['ID']}: Mother {current_fam['WIFE']} is more than 60 years old than child")
                     if parents_not_marry_descendants(families, individuals) == False:
-                        print(f"ERROR: Families {current_fam['ID']}: Mother {current_fam['WIFE']} married with a descendant.")
+                        print(
+                            f"ERROR: Families {current_fam['ID']}: Mother {current_fam['WIFE']} married with a descendant.")
                 elif tag == "CHIL" and current_fam is not None:
                     current_fam["CHIL"].append(arguments.strip())
                     if is_birthdate_before_marrdate_ofparents(current_fam["MARR"], current_fam["DIV"],
