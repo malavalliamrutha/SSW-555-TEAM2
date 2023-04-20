@@ -455,6 +455,21 @@ n5 = ["A", "B", "C"]
 b5 = ("01 APR 1999 19 JUN 2099 11 AUG 2003")
 
 #US28
+def US28(individuals, families):
+    """
+    List siblings in families by decreasing age.
+
+    """
+    siblings_by_family = []
+    
+    for family in families.values():
+        if 'CHIL' in family:
+            children = family['CHIL']
+            siblings = [individuals[child] for child in children]
+            siblings_sorted = sorted(siblings, key=lambda x: x['BIRT'], reverse=True)
+            siblings_by_family.append((family['FAM'], siblings_sorted))
+    
+    return siblings_by_family
 
 with open("gedcom_project.ged") as file:
     for line in file:
