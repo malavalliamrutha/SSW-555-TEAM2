@@ -427,6 +427,34 @@ def are_families_unique_by_spouses(families):
 
     return True
 
+#US27
+def individual_ages(names, birthdays):
+    birth_years = []
+    for birthday in birthdays.split():
+        try:
+            birth_years.append(2023 - int(birthday.split("/")[-1]))
+        except ValueError:
+            return -1
+    
+    output = []
+    for name, age in zip(names, birth_years):
+        output.append(f"{name} AGE: {age}")
+    
+    print(output)
+    return 1
+
+n1 = ["A", "B", "C"]
+b1 = ("24 APR 1895 19 JUN 1997 11 AUG 2003")
+n2 = ["A", "B", "C"]
+b2 = ("18 Jun 1979 19 JUN 2004 11 AUG 2980")
+n3 = ["A", "B", "C"]
+b3 = ("22 APR 1999 08 APR 1989 11 AUG 2033")
+n4 = ["A", "B", "C"]
+b4 = ("11 APR 1999 19 JUN 1999 11 AUG 2003")
+n5 = ["A", "B", "C"]
+b5 = ("01 APR 1999 19 JUN 2099 11 AUG 2003")
+
+#US28
 
 with open("gedcom_project.ged") as file:
     for line in file:
