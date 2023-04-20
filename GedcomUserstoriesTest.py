@@ -1,6 +1,8 @@
 import unittest
 import pytest
 import GedcomUserstories
+from GedcomUserstories import*
+
 
 from datetime import datetime, timedelta
 
@@ -297,6 +299,13 @@ class TestDates(unittest.TestCase):
         ]
         self.assertFalse(GedcomUserstories.are_families_unique_by_spouses(families))
 
-
+    #US27 test
+    def test_individual_ages(self):
+        self.assertEqual(individual_ages(n1,b1), 1)
+        self.assertEqual(individual_ages(n2, b2), -1)
+        self.assertEqual(individual_ages(n3, b3), -1)
+        self.assertEqual(individual_ages(n4, b4), 1)
+        self.assertEqual(individual_ages(n5, b5), -1)
+        
 if __name__ == '__main__':
     unittest.main()
